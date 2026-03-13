@@ -1,0 +1,119 @@
+from fastapi import APIRouter, HTTPException
+from app.schemas.esg import AnalyzeRequest, ESGMetricsResponse, ReportResponse, HistoryResponse, FacilityRegisterRequest, FacilityRegisterResponse
+from app.core.cache import get_cache, set_cache
+import sys
+import os
+import uuid
+
+# Add satellite processing to path so imports work from backend
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+from satellite_processing.metrics.deforestation_risk import calculate_deforestation_risk
+from satellite_processing.metrics.water_stress_proxy import calculate_water_stress_proxy
+from satellite_processing.metrics.urban_heat_island import calculate_urban_heat_island
+
+router = APIRouter()
+
+@router.post("/facility/register", response_model=FacilityRegisterResponse)
+async def register_facility(request: FacilityRegisterRequest):
+    """
+    Registers a facility before analysis.
+    Validates coordinates and generates a PostGIS mock point.
+    """
+    # TODO: Implement actual database insertion later
+    new_id = str(uuid.uuid4())
+    return FacilityRegisterResponse(
+        facility_id=new_id,
+        message=f"Facility '{request.name}' registered successfully."
+    )
+
+@router.get("/facility/analyze", response_model=ESGMetricsResponse)
+async def analyze_facility(latitude: float, longitude: float, radius_km: float = 5.0):
+    """
+    Analyzes a facility location and returns ESG risk indicators.
+    Uses Redis caching to avoid redundant satellite processing.
+    """
+    cache_key = f"esg_metrics:{latitude}:{longitude}:{radius_km}"
+    
+    # 1. Check Redis Cache
+    cached_data = get_cache(cache_key)
+    if cached_data:
+        return ESGMetricsResponse(**cached_data)
+        
+    # 2. If not cached, calculate metrics using satellite pipelines
+    try:
+        def_risk = calculate_deforestation_risk(latitude, longitude, radius_km)
+        water_risk = calculate_water_stress_proxy(latitude, longitude, radius_km)
+        # UHI uses standard 1km vs 10km comparison
+        uhi_risk = calculate_urban_heat_island(latitude, longitude, facility_radius_km=1.0, rural_radius_km=10.0)
+        
+        # 3. Compile Response
+        response_data = {
+            "deforestation_risk": def_risk.get("score", 0.0),
+            "water_stress_proxy": water_risk.get("score", 0.0),
+            "heat_island_index": uhi_risk.get("score", 0.0)
+        }
+        
+        # 4. Store in cache (expire in 24 hours = 86400 seconds)
+        set_cache(cache_key, response_data, 86400)
+        
+        return ESGMetricsResponse(**response_data)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+from fastapi.responses import Response
+
+# Add reporting to path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
+from reporting.generator import generate_pdf_report, generate_csv_report
+
+@router.get("/facility/report/pdf")
+async def get_report_pdf(latitude: float, longitude: float, radius_km: float = 5.0):
+    """Generates and returns a PDF compliance report."""
+    # Run analysis first to get the data
+    cache_key = f"esg_metrics:{latitude}:{longitude}:{radius_km}"
+    cached_data = get_cache(cache_key)
+    
+    if cached_data:
+        metrics = cached_data
+    else:
+        # In a real app we'd await the actual process or separate out logic
+        metrics = {
+            "deforestation_risk": calculate_deforestation_risk(latitude, longitude, radius_km).get("score", 0),
+            "water_stress_proxy": calculate_water_stress_proxy(latitude, longitude, radius_km).get("score", 0),
+            "heat_island_index": calculate_urban_heat_island(latitude, longitude).get("score", 0)
+        }
+    
+    pdf_bytes = generate_pdf_report(latitude, longitude, metrics)
+    return Response(content=pdf_bytes, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=NovaRisk_ESG_Report_{latitude}_{longitude}.pdf"})
+
+@router.get("/facility/report/csv")
+async def get_report_csv(latitude: float, longitude: float, radius_km: float = 5.0):
+    """Generates and returns a CSV compliance report."""
+    cache_key = f"esg_metrics:{latitude}:{longitude}:{radius_km}"
+    cached_data = get_cache(cache_key)
+    
+    if cached_data:
+        metrics = cached_data
+    else:
+        metrics = {
+            "deforestation_risk": calculate_deforestation_risk(latitude, longitude, radius_km).get("score", 0),
+            "water_stress_proxy": calculate_water_stress_proxy(latitude, longitude, radius_km).get("score", 0),
+            "heat_island_index": calculate_urban_heat_island(latitude, longitude).get("score", 0)
+        }
+        
+    csv_str = generate_csv_report(latitude, longitude, metrics)
+    return Response(content=csv_str, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename=NovaRisk_ESG_Report_{latitude}_{longitude}.csv"})
+
+@router.get("/facility/history", response_model=HistoryResponse)
+async def get_facility_history(latitude: float, longitude: float):
+    """
+    Returns historical satellite metrics for a facility.
+    """
+    # TODO: Fetch from database/time-series store
+    return HistoryResponse(
+        history=[
+            {"year": 2021, "deforestation": 1.2, "water_stress": 3.4, "uhi": 1.1},
+            {"year": 2022, "deforestation": 2.5, "water_stress": 4.1, "uhi": 1.5},
+            {"year": 2023, "deforestation": 3.8, "water_stress": 4.8, "uhi": 2.0},
+        ]
+    )
