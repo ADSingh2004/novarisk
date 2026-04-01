@@ -9,7 +9,8 @@ const Header = ({ activeLocation }) => {
         setIsExporting(true);
 
         try {
-            const url = `http://127.0.0.1:8000/api/v1/facility/report/pdf?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`;
+            const baseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+            const url = `${baseUrl}/api/v1/facility/report/pdf?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to generate report");

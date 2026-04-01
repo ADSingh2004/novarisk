@@ -1,0 +1,60 @@
+# AI Land Cover Classification & Explainability Integration
+
+This plan outlines the steps to introduce a lightweight Land Cover Classification AI module to the existing ESG pipeline and add an explainability endpoint.
+
+## Proposed Changes
+
+### Dependencies
+#### [MODIFY] backend/requirements.txt
+- Add `torch`, `torchvision`, and `segmentation-models-pytorch` to support the AI stack. 
+- Ensure versions are compatible with lightweight CPU deployment.
+
+---
+
+### Satellite Processing
+#### [NEW] satellite_processing/ai/land_cover_classifier.py
+- Create the core AI module.
+- Implement `calculate_land_cover_from_stac_items(items, bbox)`:
+  - Extract relevant Sentinel-2 bands (e.g., RGB/NIR).
+  - Use `segmentation_models_pytorch` to load a lightweight pretrained U-Net or FPN with an ImageNet encoder (e.g., MobileNetV3 or ResNet18) for 5 land classes: Forest, Water, Urban, Agriculture, Barren.
+  - Compute class percentages.
+  - Return percentages alongside the raw classification map (for explainability).
+
+#### [MODIFY] satellite_processing/indices/ndvi.py
+- Ensure NDVI calculation optionally returns the raw 2D array matrix or stores it in cache format for the explainability endpoint. Currently it just returns `mean_ndvi`. We will modify it to return `ndvi_array` if an `explain=True` flag is passed.
+  
+#### [MODIFY] satellite_processing/indices/ndwi.py
+- Similar to NDVI, optionally return the raw `ndwi_array`.
+
+---
+
+### Backend API & Schemas
+#### [MODIFY] backend/app/schemas/esg.py
+- Update [ESGMetricsResponse](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/app/schemas/esg.py#19-25) to include:
+  ```python
+  forest_percentage: Optional[float] = None
+  water_percentage: Optional[float] = None
+  urban_percentage: Optional[float] = None
+  agriculture_percentage: Optional[float] = None
+  barren_percentage: Optional[float] = None
+  ```
+- Add a new schema `ExplainResponse` to define the output format of `/facility/explain`.
+
+#### [MODIFY] backend/app/api/endpoints.py
+- **`/facility/analyze`**: 
+  - Call `calculate_land_cover_from_stac_items`.
+  - Pass the AI metrics into the Final ESG response.
+  - If `recalculate=True` or no cache exists, run NDVI, NDWI, and Land Cover, extract their raw 2D arrays, and store them in a new Redis key: `esg_explain:{lat}:{lon}:{rad}`.
+- **`/facility/explain`** [NEW ENDPOINT]:
+  - Add a new `GET` endpoint.
+  - Retrieve the raw data from `esg_explain:{lat}:{lon}:{rad}`.
+  - Return formatted explainability data: formulas used, input band values, step-by-step calculations, and the classification result matrix.
+
+## Verification Plan
+
+### Automated / API Tests
+- Use the `test_api.py` script or write a small test script to call `/facility/analyze` and verify the land cover percentages are correctly populated.
+- Call `GET /facility/explain` for the exact same coordinates and verify it successfully returns the expected JSON structure with intermediate matrices (NDVI array, classification map, etc.).
+
+### Manual Verification
+- Review the `/facility/explain` endpoint output manually to ensure the data structure matches what a frontend application would need to render an "Explain This Metric" modal.

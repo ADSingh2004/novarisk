@@ -1,0 +1,65 @@
+# Implementation Plan: Sentinel-1 SAR Water Detection
+
+## Goal Description
+Enhance the NovaRisk ESG satellite analytics pipeline by integrating radar-based water detection using Sentinel-1. This multi-sensor fusion approach will combine Sentinel-1 SAR (Synthetic Aperture Radar) with the existing Sentinel-2 optical NDWI methodology to provide a more robust Water Stress Proxy that performs reliably even under cloud cover or during monsoon seasons. The implementation will use `pystac-client`, `stackstac`, and `rasterio` for windowed reads of Microsoft Planetary Computer STAC APIs.
+
+## User Review Required
+> [!NOTE]
+> Currently, the backend lacks a true database ([app/api/endpoints.py](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/app/api/endpoints.py) has a `# TODO: Implement actual database insertion later` comment). The requirement to "Extend facility_metrics table to store SAR derived values" will be handled by updating any mock/schema representations (such as Pydantic schemas or mock database functions). Please confirm if there's a specific database file to update that I might have missed.
+
+## Proposed Changes
+
+### Configuration and Setup
+- No new external pip packages required (assuming `pystac-client`, `stackstac`, `rasterio` and `scipy`/`numpy` are already present in [requirements.txt](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/requirements.txt)).
+
+---
+
+### satellite_processing/client.py
+#### [MODIFY] client.py
+- Add `search_sentinel1` function to query `"sentinel-1-grd"` STAC collection.
+- Filter queries to retrieve VV and VH bands and apply standard STAC bounding box constraints.
+
+---
+
+### satellite_processing/indices/sar_water_detection.py
+#### [NEW] sar_water_detection.py
+- Implement `calculate_sar_water_mask_from_stac_items(items, bbox)`:
+  - Uses `stackstac.stack` to ingest VV band.
+  - Applies decibel conversion to radar amplitude.
+  - Applies an adjustable threshold (e.g., `< -15 dB`) to detect water pixels.
+  - Calculates and returns the detected `sar_water_area`.
+
+---
+
+### satellite_processing/metrics/water_stress_fusion.py
+#### [NEW] water_stress_fusion.py
+- Create a new fusion module orchestrating optical (Sentinel-2 NDWI) and radar (Sentinel-1 SAR) pipelines.
+- Implement `calculate_fused_water_stress_score(latitude, longitude, radius_km, facility_id=None)`:
+  - Fetch/compute both recent and historical NDWI using existing pipelines.
+  - Fetch/compute new `sar_water_detection` data for the same time periods.
+  - Fuse optical and radar metrics by averaging or fallback (if optical is poor due to clouds).
+  - Include Redis caching for the SAR output using the key format `f"sar_water_cache:{facility_id or coords}:sentinel-1-grd:{date_range}"`.
+
+---
+
+### backend/app/schemas/esg.py
+#### [MODIFY] esg.py
+- Extend [ESGMetricsResponse](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/app/schemas/esg.py#19-23) to include the new `sar_water_area` and `sar_water_change` fields.
+
+---
+
+### backend/app/api/endpoints.py
+#### [MODIFY] endpoints.py
+- Update [analyze_facility](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/app/api/endpoints.py#29-62) and reporting endpoints to import and call `calculate_fused_water_stress_score` rather than the base [calculate_water_stress_proxy](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/satellite_processing/metrics/water_stress_proxy.py#7-45).
+- Return the new merged score and expanded schema.
+
+## Verification Plan
+
+### Automated Tests
+- Run [local_perf.py](file:///c:/Users/dchan/.gemini/antigravity/scratch/novarisk_esg/backend/local_perf.py) or existing scripts to ensure bounding box optimizations correctly subset Sentinel-1 data without triggering massive downloads or out-of-memory errors.
+
+### Manual Verification
+- Start Redis, backend, and frontend locally.
+- Use the frontend dashboard or cURL `http://127.0.0.1:8000/facility/analyze?latitude=-3.465&longitude=-62.215` to trigger the augmented water stress calculation.
+- Verify radar data (Sentinel-1) is correctly queried and fetched without breaking the Sentinel-2 integration.
+- Observe terminal logs to ensure P50 cache latency remains low for subsequent runs.

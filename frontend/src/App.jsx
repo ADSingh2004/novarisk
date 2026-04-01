@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Header from './components/Header';
 import MetricCard from './components/MetricCard';
 import ESGMap from './components/ESGMap';
-import { Leaf, Droplets, ThermometerSun, MapPin } from 'lucide-react';
+import { Leaf, Droplets, ThermometerSun, MapPin, RefreshCw, HelpCircle } from 'lucide-react';
+import MethodologyModal from './components/MethodologyModal';
 
 const DEMO_LOCATIONS = [
   { name: "Amazon Rainforest", lat: -3.4653, lng: -62.2159, type: 'Deforestation Focus' },
@@ -16,7 +17,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const analyzeLocation = async (loc) => {
+  const [isExplainModalOpen, setIsExplainModalOpen] = useState(false);
+
+  const analyzeLocation = async (loc, forceRecalculate = false) => {
     setActiveLocation(loc);
     setIsLoading(true);
     setError(null);
@@ -24,7 +27,9 @@ function App() {
 
     try {
       // Fetch from FastAPI backend
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/facility/analyze?latitude=${loc.lat}&longitude=${loc.lng}&radius_km=5.0`);
+      const baseUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const url = `${baseUrl}/api/v1/facility/analyze?latitude=${loc.lat}&longitude=${loc.lng}&radius_km=5.0${forceRecalculate ? '&recalculate=true' : ''}`;
+      const response = await fetch(url);
 
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
@@ -68,20 +73,38 @@ function App() {
             <p className="text-sm text-slate-500 mt-1">Satellite-derived ESG indicators and compliance monitoring</p>
           </div>
 
-          <div className="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm overflow-x-auto max-w-full">
-            {DEMO_LOCATIONS.map(loc => (
-              <button
-                key={loc.name}
-                onClick={() => analyzeLocation(loc)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${activeLocation.name === loc.name
-                  ? 'bg-emerald-50 text-emerald-700'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-              >
-                <MapPin className="w-4 h-4" />
-                {loc.name}
-              </button>
-            ))}
+          <div className="flex gap-4 items-center flex-wrap">
+            <button 
+              onClick={() => setIsExplainModalOpen(true)} 
+              className="flex items-center gap-1.5 text-sm text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md hover:bg-blue-100 hover:text-blue-700 font-medium transition"
+            >
+              <HelpCircle className="w-4 h-4" /> Explain Calculation
+            </button>
+            
+            <button 
+              onClick={() => analyzeLocation(activeLocation, true)} 
+              disabled={isLoading} 
+              className="flex items-center gap-1.5 text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md font-medium disabled:opacity-50 transition"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin opacity-50' : ''}`} /> 
+              {isLoading ? 'Recalculating...' : 'Recalculate'}
+            </button>
+
+            <div className="flex bg-white rounded-lg p-1 border border-slate-200 shadow-sm overflow-x-auto max-w-full">
+              {DEMO_LOCATIONS.map(loc => (
+                <button
+                  key={loc.name}
+                  onClick={() => analyzeLocation(loc)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${activeLocation.name === loc.name
+                    ? 'bg-emerald-50 text-emerald-700'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    }`}
+                >
+                  <MapPin className="w-4 h-4" />
+                  {loc.name}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -131,6 +154,11 @@ function App() {
 
         </div>
       </main>
+
+      <MethodologyModal 
+        isOpen={isExplainModalOpen} 
+        onClose={() => setIsExplainModalOpen(false)} 
+      />
     </div>
   );
 }

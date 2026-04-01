@@ -1,37 +1,57 @@
 import stackstac
+import numpy as np
+import math
 from typing import Dict, Any, Tuple
 from app.utils.spatial import generate_bbox
 
-def calculate_ndwi_from_stac_items(items: list, bbox: Tuple[float, float, float, float]) -> Dict[str, Any]:
-    """
-    Calculates NDWI (Normalized Difference Water Index) from Sentinel-2 STAC items.
-    NDWI = (Green - NIR) / (Green + NIR)
-    For Sentinel-2: Green is Band 3 (B03), NIR is Band 8 (B08)
-    """
+def calculate_ndwi_from_stac_items(items: list, bbox: Tuple[float, float, float, float], explain: bool = False) -> Dict[str, Any]:
     if not items:
-        return {"error": "No Sentinel-2 items found"}
-        
+        return {"error": "No Sentinel-2 items found", "status": "failed"}
+            
     try:
+        # Use Web Mercator (EPSG:3857) to ensure meter-based resolution works
         cube = stackstac.stack(
             items,
             assets=["B03", "B08"],  # Green, NIR
-            bounds_latlon=bbox
+            bounds_latlon=bbox,
+            resolution=20,          # 20 meters
+            epsg=3857               # Web Mercator
         )
+
         
+        # Mask nodata (0 values) before computing median
+        cube = cube.where(cube > 0)
         composite = cube.median(dim="time", skipna=True).compute()
         
         green = composite.sel(band="B03").astype(float)
         nir = composite.sel(band="B08").astype(float)
         
-        # Calculate NDWI
-        ndwi = (green - nir) / (green + nir)
+        # Guard against division by zero
+        denominator = green + nir
+        ndwi = np.where(denominator != 0, (green - nir) / (green + nir), np.nan)
         
-        # Mean NDWI over the area
-        mean_ndwi = float(ndwi.mean(skipna=True).values)
+        mean_ndwi_val = float(np.nanmean(ndwi))
         
-        return {
-            "mean_ndwi": mean_ndwi,
+        # Check if result is NaN (all pixels were nodata)
+        if math.isnan(mean_ndwi_val):
+            return {"error": "NDWI calculation produced all-NaN values", "status": "failed", "mean_ndwi": 0.0}
+        
+        # Water fraction: proportion of pixels where ndwi > 0
+        valid_mask = ~np.isnan(ndwi)
+        total_valid = np.sum(valid_mask)
+        water_pixels = np.sum((ndwi > 0) & valid_mask)
+        water_fraction = float(water_pixels / total_valid) if total_valid > 0 else 0.0
+        
+
+        
+        result = {
+            "mean_ndwi": mean_ndwi_val,
+            "water_fraction": water_fraction,
             "status": "success"
         }
+        if explain:
+            result["ndwi_array"] = np.nan_to_num(ndwi if isinstance(ndwi, np.ndarray) else ndwi.values, nan=0.0).tolist()
+            
+        return result
     except Exception as e:
         return {"error": str(e), "status": "failed"}
