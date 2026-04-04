@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Dict, Any
 from app.utils.spatial import generate_bbox
-from satellite_processing.metrics.deforestation_risk import _search_sentinel2_stac
+from satellite_processing.metrics.deforestation_risk import _search_sentinel2_window
 from satellite_processing.indices.ndwi import calculate_ndwi_from_stac_items
 
 
@@ -16,13 +16,13 @@ def calculate_water_stress_proxy(latitude: float, longitude: float, radius_km: f
     bbox = generate_bbox(latitude, longitude, radius_km)
 
     # 1. Fetch recent imagery (last 60 days window)
-    recent_items = _search_sentinel2_stac(latitude, longitude,
+    recent_items = _search_sentinel2_window(latitude, longitude, radius_km,
                                              start_days_ago=60, end_days_ago=0)
     recent_ndwi_res = calculate_ndwi_from_stac_items(recent_items, bbox)
 
     if recent_ndwi_res.get("status") == "failed":
         # Try extended date range as fallback
-        recent_items = _search_sentinel2_stac(latitude, longitude,
+        recent_items = _search_sentinel2_window(latitude, longitude, radius_km,
                                                 start_days_ago=120, end_days_ago=0)
         recent_ndwi_res = calculate_ndwi_from_stac_items(recent_items, bbox)
         
@@ -42,13 +42,13 @@ def calculate_water_stress_proxy(latitude: float, longitude: float, radius_km: f
         recent_val = recent_ndwi_res["mean_ndwi"]
 
     # 2. Fetch baseline imagery (12 months ago +/- 60 day window)
-    baseline_items = _search_sentinel2_stac(latitude, longitude,
+    baseline_items = _search_sentinel2_window(latitude, longitude, radius_km,
                                                start_days_ago=425, end_days_ago=305)
     baseline_ndwi_res = calculate_ndwi_from_stac_items(baseline_items, bbox)
 
     if baseline_ndwi_res.get("status") == "failed":
         # Try extended baseline window
-        baseline_items = _search_sentinel2_stac(latitude, longitude,
+        baseline_items = _search_sentinel2_window(latitude, longitude, radius_km,
                                                    start_days_ago=365, end_days_ago=180)
         baseline_ndwi_res = calculate_ndwi_from_stac_items(baseline_items, bbox)
         
