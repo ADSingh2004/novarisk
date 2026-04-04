@@ -1,6 +1,7 @@
 import os
 import subprocess
 import logging
+import tempfile
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -8,36 +9,58 @@ logger = logging.getLogger(__name__)
 def download_s3_file_cli(s3_uri: str, destination: str) -> Path:
     """
     Downloads a file from an S3 URI using the AWS CLI.
-    This fulfills the one-time download via CLI method requirement.
-    Uses --no-sign-request for public buckets like Earth Search.
-    
-    Args:
-        s3_uri (str): The valid S3 URI, e.g. s3://sentinel-cogs/sentinel-s2-l2a-cogs/53/T/ME/2021/1/S2A_53TME_20210101_0_L2A/B04.tif
-        destination (str): Local file path for destination.
-        
-    Returns:
-        Path: The local path to the downloaded file.
+    Fixed for Windows compatibility.
+    Uses --no-sign-request for public buckets like Sentinel data.
     """
     dest_path = Path(destination)
-    if dest_path.exists() and dest_path.stat().st_size > 0:
-        logger.info(f"File {destination} already exists. Skipping download.")
-        return dest_path
-
+    
+    # FIX: On Windows, use proper temp directory instead of \tmp\
+    if dest_path.drive == '':  # Relative path or \tmp\ on Windows
+        # Use Windows temp directory
+        temp_base = Path(tempfile.gettempdir()) / "novarisk" / "s1"
+        temp_base.mkdir(parents=True, exist_ok=True)
+        dest_path = temp_base / Path(destination).name
+        logger.info(f"Redirecting download to Windows temp: {dest_path}")
+    
+    # Ensure parent directory exists
     dest_path.parent.mkdir(parents=True, exist_ok=True)
     
+    # Skip if already downloaded
+    if dest_path.exists() and dest_path.stat().st_size > 0:
+        logger.info(f"File already cached: {dest_path}")
+        return dest_path
+
+    # Construct AWS CLI command
     cmd = [
-        r"C:\Program Files\Amazon\AWSCLIV2\aws.exe", "s3", "cp",
+        r"C:\Program Files\Amazon\AWSCLIV2\aws.exe", 
+        "s3", "cp",
         s3_uri,
         str(dest_path),
         "--no-sign-request"
     ]
     
-    logger.info(f"Running subprocess: {' '.join(cmd)}")
+    logger.info(f"Downloading: {s3_uri}")
+    logger.info(f"Destination: {dest_path}")
+    
     try:
-        # Run aws s3 cli command
-        subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        logger.info(f"Successfully downloaded {s3_uri} to {dest_path}")
+        result = subprocess.run(
+            cmd, 
+            check=True, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True
+        )
+        logger.info(f"✓ Downloaded successfully: {dest_path}")
         return dest_path
+    
+    except FileNotFoundError as e:
+        logger.error("AWS CLI not found!")
+        logger.error("Install from: https://awscli.amazonaws.com/AWSCLIV2.msi")
+        raise Exception("AWS CLI not installed or not in expected path")
+    
     except subprocess.CalledProcessError as e:
-        logger.error(f"Failed to download from S3 CLI: {e.stderr.decode()}")
-        raise Exception(f"S3 CLI Download failed for {s3_uri}")
+        logger.error(f"S3 download failed: {e.stderr}")
+        logger.error(f"S3 URI: {s3_uri}")
+        logger.error(f"Destination: {dest_path}")
+        logger.error("This is expected if satellite data temporarily unavailable")
+        raise Exception(f"S3 download failed for {s3_uri}")

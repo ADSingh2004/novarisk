@@ -2,6 +2,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import endpoints
 
+import logging
+import warnings
+
+# Suppress non-critical GDAL warnings on Windows
+warnings.filterwarnings('ignore', message='.*CPLE_NotSupported.*')
+warnings.filterwarnings('ignore', category=RuntimeWarning)
+
+logger = logging.getLogger(__name__)
+logger.info("GDAL CPLE_NotSupported warnings suppressed")
+
 app = FastAPI(
     title="NovaRisk ESG API",
     description="Satellite ESG Intelligence Dashboard API",
