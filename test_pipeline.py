@@ -12,8 +12,6 @@ logging.basicConfig(
 # Add backend directory to path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "backend")))
 
-# Also add project root so satellite_processing imports resolve
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from app.api.endpoints import analyze_facility
 

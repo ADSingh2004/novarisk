@@ -7,3 +7,14 @@ stackstac>=0.5.0
 rasterio>=1.3.8
 redis>=5.0.0
 sqlalchemy
+numpy
+shapely
+eodag
+boto3
+python-dotenv
+httpx
+requests
+reportlab
+weasyprint
+xarray
+psycopg2-binary
