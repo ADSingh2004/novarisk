@@ -24,8 +24,11 @@ function App() {
 
     try {
       // Fetch from FastAPI backend
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/facility/analyze?latitude=${loc.lat}&longitude=${loc.lng}&radius_km=5.0`);
+      // Grab the URL from Vercel's environment variables
+      const baseUrl = import.meta.env.VITE_API_URL;
 
+      // Use it in your fetch request
+      const response = await fetch(`${baseUrl}/facility/analyze?latitude=${lat}&longitude=${lon}`);
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }

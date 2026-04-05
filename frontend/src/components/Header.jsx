@@ -9,9 +9,11 @@ const Header = ({ activeLocation }) => {
         setIsExporting(true);
 
         try {
-            const url = `http://127.0.0.1:8000/api/v1/facility/report/pdf?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`;
+            // Grab the URL from Vercel's environment variables
+            const baseUrl = import.meta.env.VITE_API_URL;
+            // Use it in your fetch request
+            const response = await fetch(`${baseUrl}/facility/analyze?latitude=${lat}&longitude=${lon}`);
 
-            const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to generate report");
 
             const blob = await response.blob();
