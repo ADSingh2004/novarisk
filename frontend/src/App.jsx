@@ -28,7 +28,7 @@ function App() {
       const baseUrl = import.meta.env.VITE_API_URL;
 
       // Use it in your fetch request
-      const response = await fetch(`${baseUrl}/facility/analyze?latitude=${lat}&longitude=${lon}`);
+      const response = await fetch(`${baseUrl}/facility/analyze?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`)
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
