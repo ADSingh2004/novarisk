@@ -11,7 +11,8 @@ const Header = ({ activeLocation }) => {
         try {
 
             const baseUrl = import.meta.env.VITE_API_URL;
-            const response = await fetch(`${baseUrl}/facility/analyze?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`)
+            const defaultRadius = parseFloat(import.meta.env.VITE_DEFAULT_RADIUS || '2');
+            const response = await fetch(`${baseUrl}/facility/report/pdf?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}&radius_km=${defaultRadius}`)
 
             if (!response.ok) throw new Error("Failed to generate report");
 

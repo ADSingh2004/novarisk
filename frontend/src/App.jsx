@@ -24,11 +24,12 @@ function App() {
 
     try {
       // Fetch from FastAPI backend
-      // Grab the URL from Vercel's environment variables
+      // Grab the URL and Radius from Vercel's environment variables
       const baseUrl = import.meta.env.VITE_API_URL;
+      const defaultRadius = parseFloat(import.meta.env.VITE_DEFAULT_RADIUS || '2');
 
       // Use it in your fetch request
-      const response = await fetch(`${baseUrl}/facility/analyze?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}`)
+      const response = await fetch(`${baseUrl}/facility/analyze?latitude=${activeLocation.lat}&longitude=${activeLocation.lng}&radius_km=${defaultRadius}`);
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
@@ -99,7 +100,7 @@ function App() {
 
           {/* Left Column: Map */}
           <div className="lg:col-span-2 h-[500px] bg-white rounded-xl shadow-sm border border-slate-200">
-            <ESGMap location={activeLocation} radiusKm={5} metrics={metrics} />
+            <ESGMap location={activeLocation} radiusKm={parseFloat(import.meta.env.VITE_DEFAULT_RADIUS || '2')} metrics={metrics} />
           </div>
 
           {/* Right Column: Metrics */}

@@ -18,3 +18,4 @@ reportlab
 weasyprint
 xarray
 psycopg2-binary
+statsmodels>=0.14.0

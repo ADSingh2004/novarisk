@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any, Union
+from datetime import datetime
 
 class AnalyzeRequest(BaseModel):
     latitude: float
@@ -28,3 +29,25 @@ class ReportResponse(BaseModel):
 
 class HistoryResponse(BaseModel):
     history: List[Dict[str, Any]]
+
+class LocationSchema(BaseModel):
+    latitude: float
+    longitude: float
+
+class VisualLayers(BaseModel):
+    ndvi_map_url: Optional[str] = None
+    change_map_url: Optional[str] = None
+
+class DeforestationRiskResponse(BaseModel):
+    facility_id: str
+    location: LocationSchema
+    ndvi_current: Optional[float] = None
+    ndvi_past: Optional[float] = None
+    delta_ndvi: Optional[float] = None
+    risk_score: float
+    risk_category: str  # "Low", "Moderate", "High"
+    data_mode: str  # "satellite" or "predicted"
+    confidence_score: Optional[float] = None
+    timestamp: str = ""
+    visual_layers: Optional[VisualLayers] = None
+
