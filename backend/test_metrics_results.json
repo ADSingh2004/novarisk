@@ -1,10 +1,10 @@
 {
-  "timestamp": "2026-04-04T22:44:36.790377",
+  "timestamp": "2026-04-07T20:27:46.274510",
   "total_tests": 8,
-  "passed": 4,
-  "partial": 4,
-  "failed": 0,
-  "pass_rate": "50.0%",
+  "passed": 0,
+  "partial": 0,
+  "failed": 8,
+  "pass_rate": "0.0%",
   "results": [
     {
       "location_key": "sao_paulo_brazil",
@@ -14,56 +14,37 @@
         "lon": -46.65
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
+      "timestamp": "2026-04-07T20:27:46.274510",
       "metrics": {
         "deforestation_risk": {
-          "score": 0.0,
+          "score": 21.12,
           "expected_range": [
             15,
             40
           ],
-          "within_range": false,
+          "within_range": true,
           "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 0.0,
-            "recent_ndvi": 0.1455,
-            "baseline_ndvi": 0.133,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            30,
-            60
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1673,
-            "baseline_ndwi": -0.1526,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 20.8,
-          "expected_range": [
-            8,
-            18
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 20.8,
-            "uhi_intensity_celsius": -1.04,
-            "facility_lst": 37.01,
-            "regional_lst": 38.05,
-            "status": "success"
+            "metric_name": "Deforestation Risk Score",
+            "score": 21.12,
+            "risk_score": 21.12,
+            "risk_category": "Low",
+            "ndvi_current": 0.1422,
+            "ndvi_past": 0.1293,
+            "delta_ndvi": 0.0,
+            "data_mode": "satellite",
+            "confidence_score": 1.0,
+            "timestamp": "2026-04-07T15:32:28.814785",
+            "visual_layers": {
+              "ndvi_map_url": "https://api.novarisk.net/map/-23.55_-46.65_ndvi.png",
+              "change_map_url": "https://api.novarisk.net/map/-23.55_-46.65_change.png"
+            },
+            "status": "success",
+            "sar_verification": "Unavailable - SAR Data comparison skipped (AWS CLI not configured)"
           }
         }
       },
-      "status": "PARTIAL"
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1028)')))"
     },
     {
       "location_key": "new_delhi_india",
@@ -73,56 +54,37 @@
         "lon": 77.1
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
+      "timestamp": "2026-04-07T20:27:46.274510",
       "metrics": {
         "deforestation_risk": {
-          "score": 19.02,
+          "score": 30.38,
           "expected_range": [
             20,
             45
           ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 19.02,
-            "recent_ndvi": 0.1473,
-            "baseline_ndvi": 0.1687,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            50,
-            85
-          ],
           "within_range": true,
           "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1727,
-            "baseline_ndwi": -0.187,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 2.31,
-          "expected_range": [
-            18,
-            35
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 2.31,
-            "uhi_intensity_celsius": -0.12,
-            "facility_lst": 28.56,
-            "regional_lst": 28.68,
-            "status": "success"
+            "metric_name": "Deforestation Risk Score",
+            "score": 30.38,
+            "risk_score": 30.38,
+            "risk_category": "Moderate",
+            "ndvi_current": 0.1311,
+            "ndvi_past": 0.1653,
+            "delta_ndvi": 0.0342,
+            "data_mode": "satellite",
+            "confidence_score": 1.0,
+            "timestamp": "2026-04-07T15:42:10.918054",
+            "visual_layers": {
+              "ndvi_map_url": "https://api.novarisk.net/map/28.7_77.1_ndvi.png",
+              "change_map_url": "https://api.novarisk.net/map/28.7_77.1_change.png"
+            },
+            "status": "success",
+            "sar_verification": "Unavailable - SAR Data comparison skipped (AWS CLI not configured)"
           }
         }
       },
-      "status": "PASS"
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB5E1D10>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "jakarta_indonesia",
@@ -132,57 +94,10 @@
         "lon": 106.85
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 0.0,
-          "expected_range": [
-            25,
-            50
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 0.0,
-            "recent_ndvi": 0.1075,
-            "baseline_ndvi": 0.0875,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            40,
-            75
-          ],
-          "within_range": true,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1187,
-            "baseline_ndwi": -0.0868,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 15.0,
-          "expected_range": [
-            5,
-            15
-          ],
-          "within_range": true,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 15.0,
-            "uhi_intensity_celsius": 1.5,
-            "facility_lst": null,
-            "regional_lst": null,
-            "note": "No Landsat imagery found; score estimated from geographic heuristic.",
-            "status": "success"
-          }
-        }
-      },
-      "status": "PARTIAL"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB5E2990>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "los_angeles_usa",
@@ -192,56 +107,10 @@
         "lon": -118.24
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 0.0,
-          "expected_range": [
-            18,
-            42
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 0.0,
-            "recent_ndvi": 0.127,
-            "baseline_ndvi": 0.1218,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            45,
-            70
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1478,
-            "baseline_ndwi": -0.1417,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 11.58,
-          "expected_range": [
-            12,
-            22
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 11.58,
-            "uhi_intensity_celsius": 0.58,
-            "facility_lst": 23.52,
-            "regional_lst": 22.94,
-            "status": "success"
-          }
-        }
-      },
-      "status": "PARTIAL"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB8F4E10>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "cerrado_brazil",
@@ -251,56 +120,10 @@
         "lon": -55.5
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 0.0,
-          "expected_range": [
-            50,
-            85
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 0.0,
-            "recent_ndvi": 0.4804,
-            "baseline_ndvi": 0.4652,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            25,
-            55
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.4349,
-            "baseline_ndwi": -0.4304,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 3.17,
-          "expected_range": [
-            8,
-            18
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 3.17,
-            "uhi_intensity_celsius": 0.16,
-            "facility_lst": -2.46,
-            "regional_lst": -2.62,
-            "status": "success"
-          }
-        }
-      },
-      "status": "PARTIAL"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB8F6210>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "shenyang_china",
@@ -310,56 +133,10 @@
         "lon": 123.92
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 68.33,
-          "expected_range": [
-            22,
-            48
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 68.33,
-            "recent_ndvi": 0.1021,
-            "baseline_ndvi": 0.1876,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            35,
-            65
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1611,
-            "baseline_ndwi": -0.2223,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 3.07,
-          "expected_range": [
-            15,
-            28
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 3.07,
-            "uhi_intensity_celsius": -0.15,
-            "facility_lst": -8.15,
-            "regional_lst": -7.99,
-            "status": "success"
-          }
-        }
-      },
-      "status": "PASS"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB5E2E90>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "kumasi_ghana",
@@ -369,56 +146,10 @@
         "lon": -1.63
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 54.65,
-          "expected_range": [
-            35,
-            65
-          ],
-          "within_range": true,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 54.65,
-            "recent_ndvi": 0.1384,
-            "baseline_ndvi": 0.2178,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            15,
-            40
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.1786,
-            "baseline_ndwi": -0.2595,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 41.7,
-          "expected_range": [
-            2,
-            8
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 41.7,
-            "uhi_intensity_celsius": 2.09,
-            "facility_lst": 36.98,
-            "regional_lst": 34.9,
-            "status": "success"
-          }
-        }
-      },
-      "status": "PASS"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB5E0690>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     },
     {
       "location_key": "bangalore_india",
@@ -428,56 +159,10 @@
         "lon": 77.59
       },
       "radius_km": 5.0,
-      "timestamp": "2026-04-04T22:44:36.790377",
-      "metrics": {
-        "deforestation_risk": {
-          "score": 19.69,
-          "expected_range": [
-            28,
-            52
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Deforestation Risk",
-            "score": 19.69,
-            "recent_ndvi": 0.1731,
-            "baseline_ndvi": 0.1993,
-            "status": "success"
-          }
-        },
-        "water_stress_proxy": {
-          "score": 75.0,
-          "expected_range": [
-            45,
-            75
-          ],
-          "within_range": true,
-          "full_data": {
-            "metric_name": "Water Stress Proxy",
-            "score": 75.0,
-            "recent_ndwi": -0.2014,
-            "baseline_ndwi": -0.2199,
-            "status": "success"
-          }
-        },
-        "heat_island_index": {
-          "score": 28.5,
-          "expected_range": [
-            6,
-            14
-          ],
-          "within_range": false,
-          "full_data": {
-            "metric_name": "Urban Heat Island Intensity",
-            "score": 28.5,
-            "uhi_intensity_celsius": -1.42,
-            "facility_lst": 29.99,
-            "regional_lst": 31.42,
-            "status": "success"
-          }
-        }
-      },
-      "status": "PASS"
+      "timestamp": "2026-04-07T20:27:46.274510",
+      "metrics": {},
+      "status": "FAILED",
+      "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000001ABCB8B8CD0>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))"
     }
   ]
 }

@@ -6,7 +6,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, Tabl
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib import colors
 
-def generate_csv_report(latitude: float, longitude: float, metrics: dict) -> str:
+def generate_csv_report(latitude: float, longitude: float, metrics: dict, radius_km: float = 2.0) -> str:
     """Generates a CSV string containing the ESG report data."""
     output = StringIO()
     writer = csv.writer(output)
@@ -31,7 +31,7 @@ def generate_csv_report(latitude: float, longitude: float, metrics: dict) -> str
     return output.getvalue()
 
 
-def generate_pdf_report(latitude: float, longitude: float, metrics: dict) -> bytes:
+def generate_pdf_report(latitude: float, longitude: float, metrics: dict, radius_km: float = 2.0) -> bytes:
     """Generates a PDF byte stream containing the ESG report."""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
@@ -106,10 +106,10 @@ def generate_pdf_report(latitude: float, longitude: float, metrics: dict) -> byt
     
     # Methodology Note
     elements.append(Paragraph("<b>Methodology:</b>", styles['Heading3']))
-    methodology_text = """
+    methodology_text = f"""
     This report is generated using satellite imagery from Microsoft Planetary Computer.
-    Deforestation and Water Stress are calculated by comparing current vegetation (NDVI) and water (NDWI) indices against a historical baseline from Sentinel-2.
-    Urban Heat Island (UHI) intensity is calculated by comparing Land Surface Temperature (LST) around the facility to a 10km regional buffer using Landsat Collection 2.
+    Deforestation and Water Stress are calculated by comparing current vegetation (NDVI) and water (NDWI) indices against a historical baseline from Sentinel-2 over a {radius_km}km radius. 
+    Urban Heat Island (UHI) intensity is calculated by comparing Land Surface Temperature (LST) from the immediate facility core (1km radius) to a regional baseline buffer (10km radius) using Landsat Collection 2.
     """
     elements.append(Paragraph(methodology_text, styles['Normal']))
     

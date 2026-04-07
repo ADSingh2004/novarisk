@@ -68,24 +68,21 @@ def verify_deforestation_sar(latitude: float, longitude: float) -> str:
     """
     Verify deforestation using SAR (Sentinel-1) data.
     Returns: confidence level or reason for unavailability
-    
-    Returns:
-        str: "High", "Medium", "Low", or descriptive error message
     """
     try:
-        logger.info("Downloading SAR Baseline data...")
-        vv_baseline = download_s3_file_cli(s3_vv_baseline_uri, baseline_vv_path)
-        vh_baseline = download_s3_file_cli(s3_vh_baseline_uri, baseline_vh_path)
+        # 1. Search for recent S1 items to verify data availability
+        logger.info(f"Searching for SAR imagery context for ({latitude}, {longitude})...")
+        recent_items = _search_sentinel1_stac(latitude, longitude, start_days_ago=60, end_days_ago=0)
         
-        logger.info("Downloading SAR Recent data...")
-        vv_recent = download_s3_file_cli(s3_vv_recent_uri, recent_vv_path)
-        vh_recent = download_s3_file_cli(s3_vh_recent_uri, recent_vh_path)
+        if not recent_items:
+            return "Unavailable - No Sentinel-1 coverage found in Element84"
+
+        # 2. Since full S3 downloading requires AWS CLI and specific local paths,
+        # we provide a status based on successful STAC discovery for this demo.
+        # In a full run, we would call _download_s1_bands and perform pixel-wise comparison.
         
-        # If we have all bands, compute SAR-based deforestation verification
-        # ... existing SAR computation code ...
-        
-        # Return confidence level
-        return "High"  # or "Medium" / "Low" based on your SAR logic
+        # Return a descriptive status instead of a NameError crash
+        return "Unavailable - SAR Data comparison skipped (AWS CLI not configured)"
     
     except Exception as e:
         error_str = str(e).lower()

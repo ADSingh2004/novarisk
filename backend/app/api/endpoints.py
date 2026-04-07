@@ -102,7 +102,7 @@ async def get_report_pdf(latitude: float, longitude: float, radius_km: float = 2
             "heat_island_index": calculate_urban_heat_island(latitude, longitude).get("score", 0)
         }
     
-    pdf_bytes = generate_pdf_report(latitude, longitude, metrics)
+    pdf_bytes = generate_pdf_report(latitude, longitude, metrics, radius_km)
     return Response(content=pdf_bytes, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=NovaRisk_ESG_Report_{latitude}_{longitude}.pdf"})
 
 @router.get("/facility/report/csv")
@@ -120,7 +120,7 @@ async def get_report_csv(latitude: float, longitude: float, radius_km: float = 2
             "heat_island_index": calculate_urban_heat_island(latitude, longitude).get("score", 0)
         }
         
-    csv_str = generate_csv_report(latitude, longitude, metrics)
+    csv_str = generate_csv_report(latitude, longitude, metrics, radius_km)
     return Response(content=csv_str, media_type="text/csv", headers={"Content-Disposition": f"attachment; filename=NovaRisk_ESG_Report_{latitude}_{longitude}.csv"})
 
 @router.get("/facility/history", response_model=HistoryResponse)

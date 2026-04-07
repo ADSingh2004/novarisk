@@ -1,0 +1,109 @@
+[
+  {
+    "timestamp": "2026-04-07T20:44:44.631733",
+    "location": {
+      "lat": -23.55,
+      "lon": -46.65
+    },
+    "radius_km": 5.0,
+    "metrics": {
+      "deforestation_risk": 21.12,
+      "water_stress_proxy": 75.0,
+      "heat_island_index": 20.8
+    },
+    "status": "PASS",
+    "location_key": "sao_paulo",
+    "location_name": "S\u00e3o Paulo, Brazil"
+  },
+  {
+    "timestamp": "2026-04-07T21:12:18.425371",
+    "location": {
+      "lat": 28.7,
+      "lon": 77.1
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33A0550>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "new_delhi",
+    "location_name": "New Delhi, India"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.014791",
+    "location": {
+      "lat": -6.21,
+      "lon": 106.85
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33A1950>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "jakarta",
+    "location_name": "Jakarta, Indonesia"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.034238",
+    "location": {
+      "lat": 34.05,
+      "lon": -118.24
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33A2D50>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "los_angeles",
+    "location_name": "Los Angeles, USA"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.047274",
+    "location": {
+      "lat": -10.2,
+      "lon": -55.5
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33B0550>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "cerrado",
+    "location_name": "Cerrado, Brazil"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.165805",
+    "location": {
+      "lat": 41.8,
+      "lon": 123.92
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33B1950>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "shenyang",
+    "location_name": "Shenyang, China"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.243735",
+    "location": {
+      "lat": 6.63,
+      "lon": -1.63
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33B2D50>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "kumasi",
+    "location_name": "Kumasi, Ghana"
+  },
+  {
+    "timestamp": "2026-04-07T21:34:44.252797",
+    "location": {
+      "lat": 12.97,
+      "lon": 77.59
+    },
+    "radius_km": 5.0,
+    "metrics": {},
+    "status": "FAILED",
+    "error": "HTTPSConnectionPool(host='planetarycomputer.microsoft.com', port=443): Max retries exceeded with url: /api/stac/v1 (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x000002C5D33C8190>: Failed to resolve 'planetarycomputer.microsoft.com' ([Errno 11001] getaddrinfo failed)\"))",
+    "location_key": "bangalore",
+    "location_name": "Bangalore, India"
+  }
+]
