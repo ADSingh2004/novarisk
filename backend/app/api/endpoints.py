@@ -4,6 +4,7 @@ from app.db import get_cache_db, set_cache_db
 import sys
 import os
 import uuid
+import gc
 
 # Add satellite processing to path so imports work from backend
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
@@ -71,8 +72,15 @@ async def analyze_facility(latitude: float, longitude: float, radius_km: float =
         }
         logger.info(f"Final ESG response: {response_data}")
         
-        # 4. Store in cache (expire in 24 hours = 86400 seconds)
-        set_cache_db(cache_key, response_data, 86400)
+        # 4. Store in cache persistently
+        set_cache_db(cache_key, latitude, longitude, radius_km, response_data)
+        
+        # 5. Erase heavy pipeline data variables to free memory immediately
+        del def_risk
+        del sar_conf
+        del water_risk
+        del uhi_risk
+        gc.collect()
         
         return ESGMetricsResponse(**response_data)
     except Exception as e:
@@ -165,7 +173,12 @@ async def analyze_deforestation_robust(request: AnalyzeRequest):
             "visual_layers": data.get("visual_layers", {})
         }
         
-        set_cache_db(cache_key, response, 86400)
+        set_cache_db(cache_key, request.latitude, request.longitude, request.radius_km, response)
+        
+        # Erase heavy pipeline data variables to free memory immediately
+        del data
+        gc.collect()
+        
         return DeforestationRiskResponse(**response)
     except Exception as e:
         logger.error(f"Deforestation pipeline error: {e}", exc_info=True)
